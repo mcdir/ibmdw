@@ -67,9 +67,7 @@ class CategoryAssociations:
             val = self.value(cat_idx, i)
             if val > 0:
                 assoc_cat = self.lookup(i)
-                #freqs.inc(assoc_cat, val)
                 freqs[assoc_cat] += val
-        #print freqs
         return(freqs)
 
     def display(self):
