@@ -1,4 +1,3 @@
-
 import codecs
 import locale
 import nltk
@@ -10,8 +9,8 @@ import locomotive
 
 sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
-class Application:
 
+class Application:
     def __init__(self):
         self.args = sys.argv
 
@@ -36,8 +35,7 @@ class Application:
                 key = tokens[0].strip()
                 val = tokens[1].strip()
                 categories[key] = val
-        str = '%d categories loaded from text file' % (len(categories))
-        print(str)
+        print('%d categories loaded from text file' % (len(categories)))
         return categories
 
     def knn_simple(self):
@@ -62,39 +60,29 @@ class Application:
 
     def development_feeds_list(self):
         heredoc = """
-        feed://news.yahoo.com/rss/stock-markets
-        feed://news.yahoo.com/rss/energy
-        feed://news.yahoo.com/rss/health
-        http://feeds.nytimes.com/nyt/rss/Technology
-        http://sports.espn.go.com/espn/rss/news
-        http://pragprog.com/feed/global
-        http://rubyforge.org/export/rss_sfnewreleases.php
-        http://feeds.feedburner.com/NPAThinkTank?format=xml
-        http://feeds.feedburner.com/BetterMovement?format=xml
-        http://bodyinmind.org/feed/
-        http://blog.forwardmotionpt.com/feeds/posts/default
-        http://healthskills.wordpress.com/feed/
-        http://feeds.feedburner.com/TheManualTherapist?format=xml
-        http://moveitnps.blogspot.com/feeds/posts/default
+        http://rss.cnn.com/rss/edition.rss
+        http://rss.cnn.com/rss/edition_europe.rss   
+        https://www.yahoo.com/news/rss/stock-markets
+        https://www.yahoo.com/news/rss/energy
+        https://www.yahoo.com/news/rss/health
+        http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml
+        http://www.espn.com/espn/rss/news
         """
         return self.parse_feed_list(heredoc)
 
     def locomotive_feeds_list(self):
         heredoc = """
-        http://www.thesportsphysiotherapist.com/feed/
-        http://feeds.feedburner.com/NPAThinkTank?format=xml
-        http://feeds.feedburner.com/BetterMovement?format=xml
-        http://bodyinmind.org/feed/
-        http://blog.forwardmotionpt.com/feeds/posts/default
-        http://healthskills.wordpress.com/feed/
-        http://feeds.feedburner.com/TheManualTherapist?format=xml
-        http://moveitnps.blogspot.com/feeds/posts/default
+        https://www.yahoo.com/news/rss/stock-markets
+        https://www.yahoo.com/news/rss/energy
+        https://www.yahoo.com/news/rss/health
+        http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml
+        http://www.espn.com/espn/rss/news
         """
         return self.parse_feed_list(heredoc)
 
     def stop_words(self):
         word_hash = {}
-        words_list = nltk.corpus.stopwords.words('english') # 127 words
+        words_list = nltk.corpus.stopwords.words('english')  # 127 words
         for w in words_list:
             word_hash[w] = 0
             str = 'stopword: %s' % (w)
@@ -119,7 +107,7 @@ class Application:
     def redis_connect(self):
         url = self.redis_url()
         url = urlparse.urlparse(url)
-        #return redis.Redis(host=url.hostname, port=url.port, db=0, password=url.password)
+        # return redis.Redis(host=url.hostname, port=url.port, db=0, password=url.password)
 
     def is_ascii(self, s):
         if s.__class__.__name__ == 'str':

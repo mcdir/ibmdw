@@ -60,9 +60,8 @@ class NewsArticle:
     def normalized_words(self, s):
         words   = []
         oneline = s.replace('\n', ' ').lower()
-        # cleaned = nltk.clean_html(oneline.strip())
         soup = BeautifulSoup(s, "lxml")
-        cleaned =  soup.get_text(oneline.strip())
+        cleaned = soup.get_text(oneline.strip())
         toks1   = cleaned.split()
         for t1 in toks1:
             translated = self.regex.sub('', t1)

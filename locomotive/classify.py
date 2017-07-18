@@ -1,4 +1,3 @@
-
 import codecs
 import locale
 import nltk
@@ -13,8 +12,8 @@ import locomotive
 
 sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
-class Classify:
 
+class Classify:
     def __init__(self, application):
         self.app = application
 
@@ -22,15 +21,15 @@ class Classify:
         categories = self.app.load_training_categories()
         stop_words = self.app.stop_words()
         feed_items = self.load_pickled_feed_items(self.app, categories, stop_words)
-        all_words  = self.collect_all_words(feed_items)
-        top_words  = self.identify_top_words(all_words)
+        all_words = self.collect_all_words(feed_items)
+        top_words = self.identify_top_words(all_words)
 
         random.shuffle(feed_items)
 
         featuresets = []
         for item in feed_items:
             item_features = item.features(top_words)
-            tup = (item_features, item.category) # tup is a 2-element tuple
+            tup = (item_features, item.category)  # tup is a 2-element tuple
             featuresets.append(tup)
 
         train_set = featuresets
@@ -42,18 +41,21 @@ class Classify:
         print("training complete")
 
         if True:
-            summary_lines   = []
-            detail_lines    = []
-            actual_category_counts  = {}
+            summary_lines = []
+            detail_lines = []
+            actual_category_counts = {}
             guessed_category_counts = {}
             correct_category_counts = {}
-            wrong_category_counts   = {}
-            correct_count   = 0
+            wrong_category_counts = {}
+            correct_count = 0
             wrong_count = 0
             classified_count = 0
             for item in feed_items:
-                df  = item.features(top_words)
-                cat = categories[item.lookup_key()]
+                df = item.features(top_words)
+                if item.lookup_key() in categories:
+                    cat = categories[item.lookup_key()]
+                else:
+                    cat = 'Unknown'
                 guess = classifier.classify(df)
                 result = 'wrong'
                 actual_category_counts[cat] = actual_category_counts.get(cat, 0) + 1
@@ -66,15 +68,16 @@ class Classify:
                     wrong_count = wrong_count + 1
                     wrong_category_counts[cat] = wrong_category_counts.get(cat, 0) + 1
 
-                line = 'item: %s  actual: %-18s  guess: %-18s  %-8s  %4d  %-s' % (item.lookup_key(), cat, guess, result, item.word_count(), item.title)
+                line = 'item: %s  actual: %-18s  guess: %-18s  %-8s  %4d  %-s' % (
+                    item.lookup_key(), cat, guess, result, item.word_count(), item.title)
                 summary_lines.append(self.app.to_unicode(line))
                 detail_lines.extend(item.as_debug_array(guess))
 
             print "%-16s %-10s %-10s %-10s %-10s" % ('category', 'actual', 'guessed', 'correct', 'incorrect')
             for key in sorted(actual_category_counts.iterkeys()):
-                actual    = self.dictionary_value(actual_category_counts, key)
-                guessed   = self.dictionary_value(guessed_category_counts, key)
-                correct   = self.dictionary_value(correct_category_counts, key)
+                actual = self.dictionary_value(actual_category_counts, key)
+                guessed = self.dictionary_value(guessed_category_counts, key)
+                correct = self.dictionary_value(correct_category_counts, key)
                 incorrect = self.dictionary_value(wrong_category_counts, key)
                 print "%-16s %-10s %-10s %-10s %-10s" % (key, str(actual), str(guessed), str(correct), str(incorrect))
 
@@ -114,7 +117,7 @@ class Classify:
         self.app.write_data_file('training_categories_gen.txt', out_lines)
 
     def load_pickled_feed_items(self, app, categories, stop_words):
-        feed_items  = []
+        feed_items = []
         dir_list = os.listdir(app.data_directory())
         for filename in dir_list:
             if filename.endswith(".pkl"):
@@ -142,10 +145,10 @@ class Classify:
             item_words = item.all_words
             for w in item_words:
                 words.append(w)
-                #freqs.inc(w, 1)
+                # freqs.inc(w, 1)
                 freqs[w] += 1
 
-        print('collect_all_words count: ' + str(len(words))) #
+        print('collect_all_words count: ' + str(len(words)))  #
         self.app.write_output_file('words_all.txt', words)
 
         l = []
@@ -161,24 +164,23 @@ class Classify:
         self.app.write_output_file('words_top.txt', top_words)
         return top_words
 
-
     # The following code relates to the nltk reuters data and its processing.
 
     def classify_reuters(self):
-        metadata   = self.read_reuters_metadata()
+        metadata = self.read_reuters_metadata()
         stop_words = self.app.stop_words()
-        all_words  = []
-        rss_items  = self.read_training_articles(metadata, 999999, stop_words)
-        self.app.write_output_file('item_0.txt', rss_items[0].as_debug_array(''))
+        all_words = []
+        rss_items = self.read_training_articles(metadata, 999999, stop_words)
+        self.app.write_output_file('rss_item_0.txt', rss_items[0].as_debug_array(''))
         for item in rss_items:
             for w in item.all_words:
                 all_words.append(w)
-        top_words  = self.identify_top_words(all_words)
+        top_words = self.identify_top_words(all_words)
 
         featuresets = []
         for item in rss_items:
             features = item.features(top_words)
-            tup = (features, item.category) # tup is a 2-element tuple
+            tup = (features, item.category)  # tup is a 2-element tuple
             featuresets.append(tup)
 
         train_set = featuresets
@@ -191,15 +193,21 @@ class Classify:
 
         if True:
             summary_lines = []
-            actual_category_counts  = {}; guessed_category_counts = {}
-            correct_category_counts = {}; close_category_counts = {}; wrong_category_counts = {}
-            correct_count = 0; close_count = 0; wrong_count = 0; classified_count = 0
+            actual_category_counts = {};
+            guessed_category_counts = {}
+            correct_category_counts = {};
+            close_category_counts = {};
+            wrong_category_counts = {}
+            correct_count = 0;
+            close_count = 0;
+            wrong_count = 0;
+            classified_count = 0
             for item in rss_items:
-                feat    = item.features(top_words)
-                cat     = item.category
-                guess   = classifier.classify(feat)
+                feat = item.features(top_words)
+                cat = item.category
+                guess = classifier.classify(feat)
                 item.guess = guess
-                result  = 'wrong'
+                result = 'wrong'
                 actual_category_counts[cat] = actual_category_counts.get(cat, 0) + 1
                 guessed_category_counts[guess] = guessed_category_counts.get(guess, 0) + 1
                 if item.category == guess:
@@ -219,17 +227,19 @@ class Classify:
                         wrong_category_counts[cat] = wrong_category_counts.get(cat, 0) + 1
                         self.app.write_output_file("item_%s_w.txt" % (item.item_number), item.as_debug_array(''))
 
-                line = 'fn: %-6s  in: %-6s  actual: %-18s  guess: %-18s  %-s' % (str(item.feed_number), str(item.item_number), cat, guess, result)
+                line = 'fn: %-6s  in: %-6s  actual: %-18s  guess: %-18s  %-s' % (
+                    str(item.feed_number), str(item.item_number), cat, guess, result)
                 summary_lines.append(self.app.to_unicode(line))
 
             print "%-16s %-10s %-10s %-10s %-10s" % ('category', 'actual', 'guessed', 'correct', 'incorrect')
             for key in sorted(actual_category_counts.iterkeys()):
-                actual    = self.dictionary_value(actual_category_counts, key)
-                guessed   = self.dictionary_value(guessed_category_counts, key)
-                correct   = self.dictionary_value(correct_category_counts, key)
-                close     = self.dictionary_value(close_category_counts, key)
+                actual = self.dictionary_value(actual_category_counts, key)
+                guessed = self.dictionary_value(guessed_category_counts, key)
+                correct = self.dictionary_value(correct_category_counts, key)
+                close = self.dictionary_value(close_category_counts, key)
                 incorrect = self.dictionary_value(wrong_category_counts, key)
-                print "%-16s %-10s %-10s %-10s %-10s %-10s" % (key, str(actual), str(guessed), str(correct), str(close), str(incorrect))
+                print "%-16s %-10s %-10s %-10s %-10s %-10s" % (
+                    key, str(actual), str(guessed), str(correct), str(close), str(incorrect))
 
             classified_count = correct_count + close_count + wrong_count
             correct_close_count = correct_count + close_count
@@ -274,37 +284,43 @@ class Classify:
         categories = self.app.load_training_categories()
         stop_words = self.app.stop_words()
         feed_items = self.load_pickled_feed_items(self.app, categories, stop_words)
-        all_words  = self.collect_all_words(feed_items)
-        top_words  = self.identify_top_words(all_words)
-        #random.shuffle(feed_items)
+        all_words = self.collect_all_words(feed_items)
+        top_words = self.identify_top_words(all_words)
+        # random.shuffle(feed_items)
 
         data_arrays, data_labels = [], []
 
         for item in feed_items:
             item_data = item.knn_data(top_words)
-            #print "item_data: %s \n%s " % (item.category, item_data)
+            # print "item_data: %s \n%s " % (item.category, item_data)
             data_arrays.append(item_data)
             data_labels.append(item.category)
 
         data_group = array(data_arrays)
-        correct_count = 0; wrong_count = 0
+        correct_count = 0;
+        wrong_count = 0
 
         for (i, item) in enumerate(feed_items):
-            item_data  = data_arrays[i]
+            item_data = data_arrays[i]
             result = self.knn_classify(item_data, data_group, data_labels, 3)
             if result == item.category:
                 correct_count = correct_count + 1
             else:
                 wrong_count = wrong_count + 1
-            #print str(item_data)
-            pct_correct =  (float(correct_count) / float(correct_count + wrong_count)) * 100.0
-            print "item %d  cat: %s  guess: %s  correct: %d  wrong: %d  pct_correct: %f" % (i, item.category, result, correct_count, wrong_count, pct_correct)
+            # print str(item_data)
+            pct_correct = (float(correct_count) / float(correct_count + wrong_count)) * 100.0
+            print "item %d  cat: %s  guess: %s  correct: %d  wrong: %d  pct_correct: %f" % (
+                i, item.category, result, correct_count, wrong_count, pct_correct)
 
         stop_words = self.app.stop_words()
-        all_words  = []
+        all_words = []
         metadata = ''
-        self.rss_items  = self.read_training_articles(metadata, 999999, stop_words)
-        self.app.write_output_file('item_0.txt', self.rss_items[0].as_debug_array(''))
+        self.rss_items = self.read_training_articles(metadata, 999999, stop_words)
+        try:
+            self.app.write_output_file('rss_item_0.txt', self.rss_items[0].as_debug_array(''))
+        except Exception:
+            print()
+
 
         for item in self.rss_items:
             for w in item.all_words:
@@ -320,24 +336,26 @@ class Classify:
             data_labels.append(item.category)
 
         data_group = array(data_arrays)
-        correct_count = 0; wrong_count = 0
+        correct_count = 0;
+        wrong_count = 0
 
         for (i, item) in enumerate(self.rss_items):
-            data  = data_arrays[i]
+            data = data_arrays[i]
             guess = self.knn_classify(data, data_group, data_labels, 3)
             if guess == item.category:
                 correct_count = correct_count + 1
             else:
                 wrong_count = wrong_count + 1
-            pct_correct =  (float(correct_count) / float(correct_count + wrong_count)) * 100.0
-            print "item %d  %-22s  cat: %-16s  guess: %-16s  correct: %d  wrong: %d  pct_correct: %f" % (i, item.metadata, item.category, guess, correct_count, wrong_count, pct_correct)
+            pct_correct = (float(correct_count) / float(correct_count + wrong_count)) * 100.0
+            print "item %d  %-22s  cat: %-16s  guess: %-16s  correct: %d  wrong: %d  pct_correct: %f" % (
+                i, item.metadata, item.category, guess, correct_count, wrong_count, pct_correct)
 
     def collect_unique_categories_by_freq(self):
         freqs = nltk.FreqDist()
         sorted_cats = []
         for item in self.rss_items:
             for w in item.categories:
-                #freqs.inc(w, 1)
+                # freqs.inc(w, 1)
                 freqs[w] += 1
         for cat in freqs.keys():
             sorted_cats.append(cat)
@@ -350,26 +368,26 @@ class Classify:
         print "dataset:\n%s" % (str(dataset))
         print "labels: %s" % (str(labels))
         test_cases = []
-        test_cases.append([0.1,0.1,0.6])
-        test_cases.append([0.5,0.5,0.6])
-        test_cases.append([0.6,0.6,0.6])
-        test_cases.append([0.9,0.9,0.6])
+        test_cases.append([0.1, 0.1, 0.6])
+        test_cases.append([0.5, 0.5, 0.6])
+        test_cases.append([0.6, 0.6, 0.6])
+        test_cases.append([0.9, 0.9, 0.6])
         for tc in test_cases:
             result = self.knn_classify(tc, dataset, labels, 3)
             print "result is %s for case %s , type: %s" % (result, str(tc), str(type(tc)))
 
     def create_simple_dataset(self):
-        group  = array([[1.0,1.1,0.5],[1.0,1.0, 0.5],[0.0,0.0,0.5],[0.0,0.1,0.5]])
-        labels = ['A','A','B','B']
+        group = array([[1.0, 1.1, 0.5], [1.0, 1.0, 0.5], [0.0, 0.0, 0.5], [0.0, 0.1, 0.5]])
+        labels = ['A', 'A', 'B', 'B']
         return group, labels
 
     def knn_classify(self, inX, dataSet, labels, k):
         dataSetSize = dataSet.shape[0]
-        diffMat     = tile(inX, (dataSetSize, 1)) - dataSet
-        sqDiffMat   = diffMat ** 2
-        sqDistances = sqDiffMat.sum(axis = 1)
-        distances   = sqDistances ** 0.5
-        classCount  = {}
+        diffMat = tile(inX, (dataSetSize, 1)) - dataSet
+        sqDiffMat = diffMat ** 2
+        sqDistances = sqDiffMat.sum(axis=1)
+        distances = sqDistances ** 0.5
+        classCount = {}
         sortedDistIndicies = distances.argsort()
         for i in range(k):
             voteIlabel = labels[sortedDistIndicies[i]]
@@ -379,4 +397,3 @@ class Classify:
                 classCount[voteIlabel] = 1
         sortedClassCount = sorted(classCount.iteritems(), key=operator.itemgetter(1), reverse=True)
         return sortedClassCount[0][0]
-

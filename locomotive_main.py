@@ -44,5 +44,4 @@ if __name__ == "__main__":
 
     elapsed_seconds = (time.time()) - start_time 
     elapsed_minutes = float(elapsed_seconds) / float(60)
-    print "Elapsed time: %f seconds, or %f minutes" % (elapsed_seconds, elapsed_minutes)
-    print ""
+    print("Elapsed time: %f seconds, or %f minutes" % (elapsed_seconds, elapsed_minutes))

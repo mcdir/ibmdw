@@ -1,46 +1,45 @@
-
 import logging
 import os
 import unittest
-import sys 
+import sys
 import locomotive
 
-class RssItemTest(unittest.TestCase):
 
+class RssItemTest(unittest.TestCase):
     def setUp(self):
         logging.basicConfig(stream=sys.stdout)
         logging.getLogger("RssItemTest").setLevel(logging.DEBUG)
 
-        self.app  = locomotive.app.Application()
+        self.app = locomotive.app.Application()
         self.stop_words = self.app.stop_words()
-        basedir   = self.app.reuters_metadata_dir()
-        metadata  = 'training/10043 ship iron-steel'
-        article   = locomotive.news.NewsArticle(basedir, metadata, self.stop_words) 
+        basedir = self.app.reuters_metadata_dir()
+        metadata = 'training/10043 ship iron-steel'
+        article = locomotive.news.NewsArticle(basedir, metadata, self.stop_words)
         self.item = article.as_rss_item()
 
     def tearDown(self):
         pass
-        
+
     def test_categories(self):
         cats = self.item.categories
-        #self.log(self.item.categories)
-        self.assertTrue(len(cats) == 2) 
+        # self.log(self.item.categories)
+        self.assertTrue(len(cats) == 2)
         self.assertTrue(cats[0] == 'ship')
         self.assertTrue(cats[1] == 'iron-steel')
 
     def test_in_category(self):
         self.assertTrue(self.item.in_category('ship'))
         self.assertTrue(self.item.in_category('iron-steel'))
-        self.assertFalse(self.item.in_category('tebow')) 
+        self.assertFalse(self.item.in_category('tebow'))
 
     def test_joined_categories(self):
         self.assertTrue(self.item.joined_categories() == 'ship iron-steel')
-        self.assertFalse(self.item.joined_categories() == 'tebow iron-steel') 
+        self.assertFalse(self.item.joined_categories() == 'tebow iron-steel')
 
     def test_no_stop_words(self):
         for w in self.item.all_words:
-            if self.stop_words.has_key(w): 
-                self.fail('item contains a stop word - ' + w) 
+            if self.stop_words.has_key(w):
+                self.fail('item contains a stop word - ' + w)
 
     def log(self, msg):
         log = logging.getLogger("RssItemTest")
@@ -74,4 +73,4 @@ REPORT EXPECTS SHARP DROP IN WORLD IRON IMPORTS
   to 40 mln tonnes with Chinese production increasing by 25 mln
   tonnes to 80 mln, it added.
 
-''' 
+'''

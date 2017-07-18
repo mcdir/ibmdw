@@ -129,14 +129,13 @@ class RssItem:
         return '%04d_%04d' % (self.feed_number, self.item_number)
 
     def in_category(self, cat):
-        return cat in categories
+        return cat in self.categories
 
     def normalized_words(self, s):
         words = []
         oneline = s.replace('\n', ' ')
-        #cleaned = nltk.clean_html(oneline.strip())
         soup = BeautifulSoup(s, "lxml")
-        cleaned =  soup.get_text(oneline.strip())
+        cleaned = soup.get_text(oneline.strip())
         toks1 = cleaned.split()
         for t1 in toks1:
             translated = self.regex.sub('', t1)

@@ -15,6 +15,9 @@ python locomotive_main.py recommend_by_cats > output/run_recommend_by_cats.txt
 echo "classify `date`"  
 python locomotive_main.py classify > output/run_classify.txt 
 
+echo "knn_rss `date`"
+python locomotive_main.py knn_rss > output/run_knn_rss.txt
+
 echo "classify_reuters `date`"  
 python locomotive_main.py classify_reuters > output/run_classify_reuters.txt
 
