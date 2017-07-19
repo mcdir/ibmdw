@@ -1,1 +1,6 @@
 txt_merged.txt
+.idea/
+data/*.txt
+data/*.pkl
+*.pyc
+output/*.txt

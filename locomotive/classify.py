@@ -49,7 +49,6 @@ class Classify:
             wrong_category_counts = {}
             correct_count = 0
             wrong_count = 0
-            classified_count = 0
             for item in feed_items:
                 df = item.features(top_words)
                 if item.lookup_key() in categories:
