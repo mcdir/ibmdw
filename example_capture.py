@@ -22,5 +22,5 @@ class CaptureFeeds:
 
 if __name__ == "__main__":
     cf = CaptureFeeds()
-    feed = feedparser.parse("http://feeds.nytimes.com/nyt/rss/Technology")
+    feed = feedparser.parse("http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml")
     print(feed)
